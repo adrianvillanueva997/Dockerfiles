@@ -1,0 +1,32 @@
+version: '3'
+services: 
+    portainer:
+        image: portainer/portainer:latest
+        container_name: portainer
+        networks: 
+            - proxy
+        ports:
+            - 9000:9000
+            - 8000:8000
+        volumes: 
+            - /var/run/docker.sock:/var/run/docker.sock
+            - portainer_data:/data
+        labels: 
+            - "traefik.enable=true"
+            - "traefik.http.middlewares.portainer-redirect-websecure.redirectscheme.scheme=https"
+            - "traefik.http.middlewares.portainer-redirect-websecure.redirectscheme.permanent=true"
+            - "traefik.http.routers.portainer-web.middlewares=portainer-redirect-https"
+            - traefik.http.routers.portainer-web.rule=Host(`portainer.thexiao77.xyz`)
+            - traefik.http.routers.portainer-web.entrypoints=web
+            - traefik.http.routers.portainer-websecure.rule=Host(`portainer.thexiao77.xyz`)
+            - traefik.http.routers.porure.tls.certresolver=le
+            - traefik.http.routers.portainer-websecure.tls=true
+            - "traefik.http.services.portainer-websecure.loadbalancer.server.port=9000"
+            - traefik.http.routers.portainer-websecure.entrypoints=web-secured
+            - "traefik.docker.network=proxy"
+networks: 
+    proxy:
+        external: true
+
+volumes: 
+    portainer_data:
