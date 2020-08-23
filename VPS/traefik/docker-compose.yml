@@ -43,14 +43,21 @@ services:
       - proxy # <== Placing traefik on the network named web, to access containers on this network
     labels:
     #### Labels define the behavior and rules of the traefik proxy for this container ####
-      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-      - "traefik.http.routers.api.rule=Host(`traefik.thexiao77.xyz`)" # <== Setting the domain for the dashboard
-      - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
-      - "traefik.http.routers.api.tls=true"
-      - "traefik.http.routers.api.tls.certresolver=le"
-      - "traefik.http.routers.api.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:yourpasswordencrypted"
+    - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+    - "traefik.http.routers.traefik.middlewares=traefik-chained-md"
+    - "traefik.http.routers.api.rule=Host(`subdomain.domain.com`)" # <== Setting the domain for the dashboard
+    - "traefik.http.middlewares.traefik-chained-md.chain.middlewares=traefik-https,traefik-auth"
+    - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:password"
+    - "traefik.http.middlewares.traefik-https.redirectscheme.scheme=https"
+    - "traefik.http.middlewares.traefik-https.redirectscheme.permanent=true"
+    - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
+    - traefik.http.routers.traefik-websecure.rule=Host(`subdomain.domain.com`)
+    - traefik.http.routers.traefik-websecure.tls.certresolver=le
+    - traefik.http.routers.traefik-websecure.tls=true
+    - traefik.http.routers.traefik-websecure.entrypoints=web-secured
+    
+    
 
 networks: 
     proxy:
-        driver: bridge
+        external: true
