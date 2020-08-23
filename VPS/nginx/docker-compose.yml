@@ -1,0 +1,16 @@
+version: "3"
+services: 
+    web:
+        container_name: thexiao77.xyz
+        image: nginx:latest
+        restart: unless-stopped
+        networks: 
+            - proxy
+        labels: 
+            - "traefik.enable=true"
+            - "traefik.http.routers.nginx.entrypoints=web"
+            - "traefik.http.routers.nginx.rule=Host(`thexiao77.xyz`)"
+            
+networks: 
+    proxy:
+        external: true

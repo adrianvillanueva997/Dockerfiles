@@ -1,0 +1,24 @@
+version: '3'
+services:
+  mariadb_bots:
+    image: mariadb:latest
+    container_name: mariadb_bots
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb/:/var/lib/mysql
+    networks:
+      - backend
+      - proxy
+
+networks:
+  backend:
+    external: true
+  proxy:
+    external: true
+
+volumes:
+  mariadb:

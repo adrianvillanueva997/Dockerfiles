@@ -12,6 +12,8 @@ services:
       - "80:80" # <== http
       - "8080:8080" # <== :8080 is where the dashboard runs on
       - "443:443" # <== https
+      # - "3306:3306" # <== mariadb/mysql
+      # - 5432:5432 # <== postgresql
     command:
     #### These are the CLI commands that will configure Traefik and tell it how to work! ####
       ## API Settings - https://docs.traefik.io/operations/api/, endpoints - https://docs.traefik.io/operations/api/#endpoints ##
@@ -24,11 +26,15 @@ services:
       - --providers.docker=true # <== Enabling docker as the provider for traefik
       - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik, only expose enabled ones
       - --providers.file.filename=/dynamic.yaml # <== Referring to a dynamic configuration file
-      - --providers.docker.network=proxy # <== Operate on the docker network named web
+      - --providers.docker.network=proxy # <== Operate on the docker network named proxy
 
-      ## Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+      ## Entrypoints Settings
+      # Web related stuff 
       - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
       - --entrypoints.web-secured.address=:443 # <== Defining an entrypoint for https on port :443 named web-secured
+      # Databases
+      # - --entrypoints.mariadb.address=:3306 # mariadb
+      # - --entrypoints.postgres.address=:5432 # postgres
 
       ## Certificate Settings (Let's Encrypt) -  https://docs.traefik.io/https/acme/#configuration-examples ##
       - --certificatesresolvers.le.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
@@ -44,19 +50,18 @@ services:
     labels:
     #### Labels define the behavior and rules of the traefik proxy for this container ####
     - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-    - "traefik.http.routers.traefik.middlewares=traefik-chained-md"
-    - "traefik.http.routers.api.rule=Host(`subdomain.domain.com`)" # <== Setting the domain for the dashboard
-    - "traefik.http.middlewares.traefik-chained-md.chain.middlewares=traefik-https,traefik-auth"
-    - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:password"
+    - "traefik.http.routers.api.rule=Host(`traefik.thexiao77.xyz`)" # <== Setting the domain for the dashboard
+    - "traefik.http.routers.api.middlewares=traefik-https"
     - "traefik.http.middlewares.traefik-https.redirectscheme.scheme=https"
     - "traefik.http.middlewares.traefik-https.redirectscheme.permanent=true"
     - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
-    - traefik.http.routers.traefik-websecure.rule=Host(`subdomain.domain.com`)
-    - traefik.http.routers.traefik-websecure.tls.certresolver=le
-    - traefik.http.routers.traefik-websecure.tls=true
-    - traefik.http.routers.traefik-websecure.entrypoints=web-secured
-    
-    
+    - "traefik.http.routers.api.middlewares=traefik-auth"
+    - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:asdasdasd/"
+    - traefik.http.routers.api.tls.certresolver=le
+    - traefik.http.routers.api.tls=true
+    - traefik.http.routers.api.entrypoints=web-secured
+    - "traefik.docker.network=proxy"
+
 
 networks: 
     proxy:

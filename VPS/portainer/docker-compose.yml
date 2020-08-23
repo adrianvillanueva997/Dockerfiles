@@ -24,6 +24,7 @@ services:
             - "traefik.http.services.portainer-websecure.loadbalancer.server.port=9000"
             - traefik.http.routers.portainer-websecure.entrypoints=web-secured
             - "traefik.docker.network=proxy"
+            - "com.centurylinklabs.watchtower.enable=true" # label for watchtower
 networks: 
     proxy:
         external: true

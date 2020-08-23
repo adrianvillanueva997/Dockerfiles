@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+  mariadb:
+    container_name: mariadb_bots
+    image: mariadb
+    restart: unless-stopped
+    labels: 
+        - traefik.enabled=true
+        - traefik.docker.network=proxy
+        - traefik.tcp.routers.mariadb-bots.entrypoints=mariadb
+        - "traefik.tcp.routers.mariadb-bots.rule=HostSNI(`mariadb.thexiao77.xyz`)"
+        - "traefik.tcp.routers.mariadb.service=dbtest"
+        - "traefik.tcp.routers.mariadb.entrypoints=mysql"
+        - "traefik.tcp.routers.mariadb.service=mariadb-svc"
+        - "traefik.tcp.services.mariadb-svc.loadbalancer.server.port=3306"
+        - character-set-server=utf8mb4
+        - collation-server=utf8mb4_unicode_ci
+        
+    volumes:
+            - ./mariadb:/var/lib/mysql
+    networks:
+        - proxy
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+
+networks: 
+    proxy:
+        external: true
+volumes: 
+    mariadb:

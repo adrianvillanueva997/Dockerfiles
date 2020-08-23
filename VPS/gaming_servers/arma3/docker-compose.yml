@@ -1,0 +1,28 @@
+version: '3'
+services: 
+    arma3:
+        container_name: arma3_server
+        image: synixebrett/arma3server
+        restart: unless-stopped
+        ports:
+            - 2302:2302/udp
+            - 2303:2302/udp
+            - 2304:2304/udp
+            - 2305:2305/udp
+        volumes: 
+            - ./arma3/mpmissions:/arma3/mpmissions
+            - ./arma3/configs:/arma3/configs
+            - ./arma3/mods:/arma3/mods
+            - ./arma3/servermods:/arma3/servermods
+        environment: 
+            - ARMA_CONFIG=main.cfg
+            - STEAM_USER=username
+            - STEAM_PASSWORD=password
+
+volumes: 
+    mpmissions:
+    configs:
+    mods:
+    servermods:
+        
+            

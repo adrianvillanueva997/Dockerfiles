@@ -1,0 +1,18 @@
+version: '3'
+services:
+    watchtower:
+        container_name: watchtower
+        command: --label-enable --interval 300
+        image: containrrr/watchtower
+        labels:
+            - "traefik.enable=true"
+            - "com.centurylinklabs.watchtower.enable=true"
+        networks: 
+            - proxy
+        restart: unless-stopped
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+
+networks: 
+    proxy:
+        external: true
