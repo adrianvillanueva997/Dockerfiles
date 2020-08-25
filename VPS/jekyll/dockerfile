@@ -1,0 +1,7 @@
+FROM jekyll/jekyll
+
+RUN apk add --no-cache imagemagick bash pngcrush optipng=0.7.7-r0
+
+CMD [ "bash" ]
+
+EXPOSE 4000
