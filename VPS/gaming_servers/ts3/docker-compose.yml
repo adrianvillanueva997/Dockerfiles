@@ -1,0 +1,40 @@
+version: '3.1'
+services:
+  teamspeak:
+    container_name: ts3
+    image: teamspeak
+    restart: unless-stopped
+    ports:
+      - 9987:9987/udp
+      - 10011:10011
+      - 30033:30033
+    environment:
+      TS3SERVER_DB_PLUGIN: ts3db_mariadb
+      TS3SERVER_DB_SQLCREATEPATH: create_mariadb
+      TS3SERVER_DB_HOST: db
+      TS3SERVER_DB_USER: root
+      TS3SERVER_DB_PASSWORD: password
+      TS3SERVER_DB_NAME: teamspeak
+      TS3SERVER_DB_WAITUNTILREADY: 30
+      TS3SERVER_LICENSE: accept
+    volumes: 
+        - ./ts3:/var/ts3server
+    labels: 
+        - "com.centurylinklabs.watchtower.enable=true"
+  db:
+    container_name: mariadb_ts3
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: teamspeak
+    volumes:
+        - ./ts3_mariadb/:/var/lib/mysql
+
+volumes: 
+    ts3:
+    ts3_mariadb:
+        
+networks: 
+    proxy:
+        external: true
