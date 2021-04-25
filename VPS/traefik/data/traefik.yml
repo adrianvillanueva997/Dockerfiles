@@ -1,0 +1,39 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+api:
+  dashboard: true
+  debug: true
+log:
+  level: INFO
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addServicesLabels: true
+accessLog:
+  format: json
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+  metrics:
+    address: ":8082"
+serversTransport:
+    insecureSkipVerify: true
+providers:
+  docker: 
+    endpoint: "unix://var/run/docker.sock"
+    exposedByDefault: false
+  file:
+    filename: /config.yml
+certificatesResolvers:
+  le:
+    acme:
+      httpChallenge:
+        entryPoint: http
+      email: youremailgoeshere
+      storage: acme.json
+      
